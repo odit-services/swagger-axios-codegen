@@ -32,13 +32,12 @@ export function getRequestBody(requestBody: IRequestBody) {
       bodyType = refClassName(reqBody.schema.$ref)
       // console.log('propType', refClassName(p.schema.$ref))
     }
+    //TODO: Only temp fix (needs recursion to be perfect)
     else if (reqBody.schema.oneOf) {
       bodyType = reqBody.schema.oneOf.reduce((p, c) => `${p} | ${refClassName(c.$ref)}`, "").substring(3);
-      console.log(bodyType)
     }
     else if (reqBody.schema.anyOf) {
       bodyType = reqBody.schema.anyOf.reduce((p, c) => `${p} | ${refClassName(c.$ref)}`, "").substring(3);
-      console.log(bodyType)
     }
     if (bodyType) {
       imports.push(bodyType)
