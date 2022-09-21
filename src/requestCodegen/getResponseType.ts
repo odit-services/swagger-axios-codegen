@@ -39,6 +39,11 @@ export function getResponseType(reqProps: IRequestMethod, isV3: boolean): { resp
       const refType = refClassName(resSchema.items.$ref)
       isRef = true
       result = refType + '[]'
+    } else if (resSchema.items.oneOf) {
+      result = resSchema.items.oneOf.reduce((p, c) => `${p} | ${refClassName(c.$ref)} []`, "").substring(3);
+    }
+    else if (resSchema.items.anyOf) {
+      result = resSchema.items.anyOf.reduce((p, c) => `${p} | ${refClassName(c.$ref)} []`, "").substring(3);
     } else {
       const refType = toBaseType(resSchema.items.type, resSchema.items.format)
       result = refType + '[]'
@@ -47,6 +52,12 @@ export function getResponseType(reqProps: IRequestMethod, isV3: boolean): { resp
     // 如果是引用对象
     result = refClassName(resSchema.$ref) || 'any'
     isRef = true
+  }
+  else if (resSchema.oneOf) {
+    result = resSchema.oneOf.reduce((p, c) => `${p} | ${refClassName(c.$ref)}`, "").substring(3);
+  }
+  else if (resSchema.anyOf) {
+    result = resSchema.anyOf.reduce((p, c) => `${p} | ${refClassName(c.$ref)}`, "").substring(3);
   } else {
     result = checkType
     result = toBaseType(result, format)

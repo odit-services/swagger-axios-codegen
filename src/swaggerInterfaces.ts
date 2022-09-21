@@ -31,25 +31,24 @@ export interface IRequestMethod {
     [key: string]: {
       description: string
       // v2
-      schema: {
-        '$ref': string,
-        'type'?: string,
-        'items'?: IParameterItems,
-        'format'?: string,
-      },
+      schema: IResponseSchema,
       // v3
       content: {
         [key: string]: {
-          schema: {
-            '$ref': string,
-            'type'?: string,
-            'items'?: IParameterItems,
-            'format'?: string,
-          }
+          schema: IResponseSchema
         }
       }
     }
   }
+}
+
+export interface IResponseSchema {
+  '$ref': string
+  'oneOf': IResponseSchema[]
+  'anyOf': IResponseSchema[]
+  'type'?: string
+  'items'?: IParameterItems
+  'format'?: string
 }
 
 export interface IRequestBody {
@@ -85,6 +84,8 @@ export interface IParameterItems {
   type?: string
   format?: string
   $ref: string
+  oneOf: IParameterItems[]
+  anyOf: IParameterItems[]
   items?: IParameterItems
 }
 
