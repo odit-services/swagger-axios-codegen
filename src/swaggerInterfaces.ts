@@ -125,6 +125,8 @@ export interface IComponents {
 
 export interface ISchema {
   '$ref': string
+  'oneOf': ISchema[]
+  'anyOf': ISchema[]
   'type'?: string
   'items'?: IParameterItems
   'format'?: string,
