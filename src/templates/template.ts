@@ -1,9 +1,9 @@
-import camelcase from 'camelcase'
+import { camelCase } from 'scule'
 import { IPropDef, ISwaggerOptions } from '../baseInterfaces'
 import { toBaseType, isDefinedGenericTypes, getDefinedGenericTypes } from '../utils'
 
 const baseTypes = ['string', 'number', 'object', 'boolean', 'any']
-const isAdditionalProperties = (x: string) => x === "[additionalProperties: string]"
+const isAdditionalProperties = (x: string) => x === '[additionalProperties: string]'
 const isNotAdditionalProperties = (x: string) => !isAdditionalProperties(x)
 
 /** 类模板 */
@@ -19,7 +19,7 @@ export function interfaceTemplate(
   }
   // 所有的引用
   const importString = imports
-    .map(imp => {
+    .map((imp) => {
       return `import { ${imp} } from '../definitions/${imp}'\n`
     })
     .join('')
@@ -29,15 +29,19 @@ export function interfaceTemplate(
 
   export interface ${name} {
 
-    ${props.map(p => classPropsTemplate(
-    p.name,
-    p.type,
-    p.format,
-    p.desc,
-    (!strictNullChecks || !(p.validationModel as any)?.required) && !isAdditionalProperties(p.name),
-    false,
-    false
-  )).join('')}
+    ${props
+      .map((p) =>
+        classPropsTemplate(
+          p.name,
+          p.type,
+          p.format,
+          p.desc,
+          (!strictNullChecks || !(p.validationModel as any)?.required) && !isAdditionalProperties(p.name),
+          false,
+          false
+        )
+      )
+      .join('')}
   }
   `
 }
@@ -52,7 +56,7 @@ export function classTemplate(
   generateValidationModel: boolean
 ) {
   // 所有的引用
-  const mappedImports = imports.map(imp => {
+  const mappedImports = imports.map((imp) => {
     return `import { ${imp} } from '../definitions/${imp}'\n`
   })
 
@@ -67,7 +71,7 @@ export function classTemplate(
   export class ${name} {
 
     ${props
-      .map(p =>
+      .map((p) =>
         classPropsTemplate(
           p.name,
           p.type,
@@ -75,13 +79,13 @@ export function classTemplate(
           p.desc,
           !strictNullChecks || !(p.validationModel as any)?.required,
           useClassTransformer,
-          p.isEnum || p.isType,
+          p.isEnum || p.isType
         )
       )
       .join('')}
 
     constructor(data: (undefined | any) = {}){
-        ${props.map(p => classConstructorTemplate(p.name)).join('')}
+        ${props.map((p) => classConstructorTemplate(p.name)).join('')}
     }
     ${generateValidationModel ? classValidationModelTemplate(props) : ''}
   }
@@ -139,9 +143,9 @@ export function classValidationModelTemplate(props: IPropDef[]) {
   return `
     public static validationModel = {
       ${props
-      .filter(p => p.validationModel !== null)
-      .map(p => propValidationModelTemplate(p.name, p.validationModel))
-      .join(',\n')}
+        .filter((p) => p.validationModel !== null)
+        .map((p) => propValidationModelTemplate(p.name, p.validationModel))
+        .join(',\n')}
     }
   `
 }
@@ -209,26 +213,26 @@ export function requestTemplate(name: string, requestSchema: IRequestSchema, opt
   const isArrayType = responseType.indexOf('[') > 0
   const transform = useClassTransformer && baseTypes.indexOf(nonArrayType) < 0
   const resolveString = transform
-    ? `(response: any${isArrayType ? '[]' : ''
-    }) => resolve(plainToClass(${nonArrayType}, response))`
+    ? `(response: any${isArrayType ? '[]' : ''}) => resolve(plainToClass(${nonArrayType}, response))`
     : 'resolve'
 
   return `
 /**
  * ${summary || ''}
  */
-${options.useStaticMethod ? 'static' : ''} ${camelcase(
+${options.useStaticMethod ? 'static' : ''} ${camelCase(
     name
   )}(${parameters}options:IRequestOptions={}):Promise<${responseType}> {
   return new Promise((resolve, reject) => {
     let url = basePath+'${path}'
     ${pathReplace}
-    ${parsedParameters && headerParameters && headerParameters.length > 0
-      ? `options.headers = {${headerParameters}, ...options.headers }`
-      : ''}
+    ${
+      parsedParameters && headerParameters && headerParameters.length > 0
+        ? `options.headers = {${headerParameters}, ...options.headers }`
+        : ''
+    }
     const configs:IRequestConfig = getConfigs('${method}', '${contentType}', url, options)
     ${parsedParameters && queryParameters.length > 0 ? 'configs.params = {' + queryParameters.join(',') + '}' : ''}
-    
     
     ${requestBodyString(method, parsedParameters, bodyParameter, requestBody, contentType, formData)}
     
@@ -237,20 +241,28 @@ ${options.useStaticMethod ? 'static' : ''} ${camelcase(
 }`
 }
 
-function requestBodyString(method: string, parsedParameters: [], bodyParameter: [], requestBody: string, contentType: string, formData: string) {
+function requestBodyString(
+  method: string,
+  parsedParameters: [],
+  bodyParameter: [],
+  requestBody: string,
+  contentType: string,
+  formData: string
+) {
   if (method !== 'get') {
+    // support for ios13 (get method does not have body)
     return `
-    let data = ${parsedParameters && bodyParameter && bodyParameter.length > 0
-        ?
-        bodyParameter
+    let data = ${
+      parsedParameters && bodyParameter && bodyParameter.length > 0
+        ? bodyParameter
         : !!requestBody
-          ? 'params.body'
-          : 'null'
-      }
+        ? 'params.body'
+        : 'null'
+    }
     ${contentType === 'multipart/form-data' ? formData : ''}
     configs.data = data;`
   }
-  return '/** 适配ios13，get请求不允许带body */'
+  return ''
 }
 
 /** serviceTemplate */
@@ -259,7 +271,6 @@ export function serviceTemplate(name: string, body: string, imports: string[] = 
   let mappedImports = !imports ? '' : `import { ${imports.join(',')}, } from './index.defs'\n`
 
   // }
-
 
   return `
 

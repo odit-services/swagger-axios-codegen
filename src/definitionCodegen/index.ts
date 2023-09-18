@@ -29,7 +29,7 @@ export function definitionsCodeGen(definitions: IDefinitions) {
         // default definition generate
         const { enums, model } = createDefinitionClass(className, v.properties, v.required)
         // console.log('createDefinitionClass', enums)
-        enums.forEach(item => {
+        enums.forEach((item) => {
           // definitionModels[item.name] = {
           //   value: item.text
           // }

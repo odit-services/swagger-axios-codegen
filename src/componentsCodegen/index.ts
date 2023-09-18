@@ -29,9 +29,9 @@ export function componentsCodegen(definitions: IComponents) {
         // #TODO
       } else {
         // default definition generate
-        const { enums, model } = createDefinitionClass(className, v.properties, v.additionalProperties, v.required);
+        const { enums, model } = createDefinitionClass(className, v.properties, v.additionalProperties, v.required)
         // console.log('createDefinitionClass', enums)
-        enums.forEach(item => {
+        enums.forEach((item) => {
           // definitionModels[item.name] = {
           //   value: item.text
           // }

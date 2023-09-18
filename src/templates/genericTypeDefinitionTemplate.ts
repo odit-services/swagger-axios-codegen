@@ -8,7 +8,7 @@ export function universalGenericTypeDefinition() {
     export interface Dictionary<TValue> extends IDictionary<TValue>{
     
     }
-  `;
+  `
 }
 
 export function abpGenericTypeDefinition() {
@@ -32,5 +32,3 @@ export class PagedResultDto<T=any> implements IPagedResult<T> {
 }
   `
 }
-
-

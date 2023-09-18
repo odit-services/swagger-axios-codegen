@@ -2,7 +2,7 @@ import { IParameter } from '../swaggerInterfaces'
 
 import { refClassName, toBaseType, RemoveSpecialCharacters } from '../utils'
 
-import camelcase from 'camelcase'
+import { camelCase } from 'scule'
 
 /**
  * 参数去重
@@ -11,12 +11,12 @@ import camelcase from 'camelcase'
  */
 function getUniqParams(params: IParameter[]): IParameter[] {
   const uniqParams: Record<string, IParameter> = {}
-  params.forEach(v => {
+  params.forEach((v) => {
     // _${v.in}
     // TODO:同名但是v.in= query |path |body 的情况同时出现如何处理？分出不同的request参数？
-    if ('$ref' in v && !('name' in v)) {
-      v.name = refClassName(v.$ref)
-    }
+    // if ('$ref' in v && !('name' in v)) {
+    //   v.name = refClassName(v.$ref)
+    // }
     if (!v.name.includes('[0]')) {
       //DTO class中存在List<T>时会出现这种参数 (list[0].prop)
       uniqParams[`${v.name}`] = v
@@ -38,8 +38,8 @@ export function getRequestParameters(params: IParameter[], useHeaderParameters: 
   let bodyParameters: string[] = []
   let headerParameters: string[] = []
   let imports: string[] = []
-  let moreBodyParams = params.filter(item => item.in === 'body').length > 1
-  params.forEach(p => {
+  let moreBodyParams = params.filter((item) => item.in === 'body').length > 1
+  params.forEach((p) => {
     // 根据设置跳过请求头中的参数
     if (!useHeaderParameters && p.in === 'header') return
     let propType = ''
@@ -68,7 +68,7 @@ export function getRequestParameters(params: IParameter[], useHeaderParameters: 
       propType = toBaseType(p.type)
     }
 
-    const paramName = camelcase(p.name)
+    const paramName = camelCase(p.name)
     requestParameters += `
     /** ${p.description || ''} */
     ${paramName}${p.required ? '' : '?'}:${propType},`

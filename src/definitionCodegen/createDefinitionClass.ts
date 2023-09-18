@@ -1,9 +1,8 @@
-import { IDefinitionProperties } from "../swaggerInterfaces";
-import { propTrueType } from "./propTrueType";
-import pascalcase from "pascalcase";
-import { IClassDef } from "../baseInterfaces";
-import { getValidationModel } from "../utils";
-
+import { IDefinitionProperties } from '../swaggerInterfaces'
+import { propTrueType } from './propTrueType'
+import { pascalCase } from 'scule'
+import { IClassDef } from '../baseInterfaces'
+import { getValidationModel } from '../utils'
 
 /**
  * 生成类定义
@@ -12,11 +11,7 @@ import { getValidationModel } from "../utils";
  * @param isGenericsType 是否是泛型接口
  */
 
-export function createDefinitionClass(
-  className: string,
-  properties: IDefinitionProperties,
-  required: string[]
-) {
+export function createDefinitionClass(className: string, properties: IDefinitionProperties, required: string[]) {
   /** 枚举值 */
   let enums = []
   let types = []
@@ -24,20 +19,23 @@ export function createDefinitionClass(
   const propertiesEntities = Object.entries(properties || {})
   for (const [k, v] of propertiesEntities) {
     // console.log('props name', k)
-    let { propType, isEnum, isArray, isType, ref } = propTrueType(v);
+    let { propType, isEnum, isArray, isType, ref } = propTrueType(v)
     if (isEnum) {
-      let enumName = `Enum${className}${pascalcase(k)}`
+      let enumName = `Enum${className}${pascalCase(k)}`
       enums.push({
-        name: enumName, text: `export enum ${enumName}{
+        name: enumName,
+        text: `export enum ${enumName}{
         ${propType}
-      }`})
+      }`
+      })
       propType = isArray ? enumName + '[]' : enumName
       ref = enumName
     }
     if (isType) {
-      let typeName = `I${className}${pascalcase(k)}`
+      let typeName = `I${className}${pascalCase(k)}`
       enums.push({
-        name: typeName, text: `type ${typeName} = ${propType};`
+        name: typeName,
+        text: `type ${typeName} = ${propType};`
       })
       propType = isArray ? typeName + '[]' : typeName
       ref = typeName
@@ -46,9 +44,17 @@ export function createDefinitionClass(
     if (!!ref) {
       model.imports.push(ref)
     }
-    let validationModel = getValidationModel(k, v, required);
+    let validationModel = getValidationModel(k, v, required)
     // propsStr += classPropsTemplate(k, propType, v.description)
-    model.props.push({ name: k, type: propType, format: v.format, desc: v.description?.replace(/\//g, '\/'), isType, isEnum, validationModel })
+    model.props.push({
+      name: k,
+      type: propType,
+      format: v.format,
+      desc: v.description?.replace(/\//g, '/'),
+      isType,
+      isEnum,
+      validationModel
+    })
   }
   // : classTemplate(className, propsStr, constructorStr)
   return { enums, model }

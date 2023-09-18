@@ -14,7 +14,7 @@ export function mapFormDataToV2(schema: ISchema): IParameter[] {
     return []
   }
 
-  return Object.keys(properties).map(p => ({
+  return Object.keys(properties).map((p) => ({
     in: 'formData',
     name: p,
     description: '',

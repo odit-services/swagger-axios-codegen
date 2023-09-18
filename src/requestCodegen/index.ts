@@ -2,21 +2,20 @@ import { getMethodName, RemoveSpecialCharacters } from '../utils'
 import { IPaths } from '../swaggerInterfaces'
 import { getRequestParameters } from './getRequestParameters'
 import { getResponseType } from './getResponseType'
-import camelcase from 'camelcase'
-import { isNullOrUndefined } from 'util'
+import { camelCase, pascalCase } from 'scule'
 import { getRequestBody } from './getRequestBody'
 import { ISwaggerOptions } from '../baseInterfaces'
 import { getContentType } from './getContentType'
 import { mapFormDataToV2 } from './mapFormDataToV2'
 
 export interface IRequestClass {
-  [key: string]: IRequestMethods[];
+  [key: string]: IRequestMethods[]
 }
 
 export interface IRequestMethods {
-  name: string;
-  operationId: string;
-  requestSchema: any;
+  name: string
+  operationId: string
+  requestSchema: any
 }
 
 export function requestCodegen(paths: IPaths, isV3: boolean, options: ISwaggerOptions): IRequestClass {
@@ -43,7 +42,7 @@ export function requestCodegen(paths: IPaths, isV3: boolean, options: ISwaggerOp
         let pathReplace = ''
         // 获取类名
         if (!reqProps.tags) continue
-        const className = camelcase(RemoveSpecialCharacters(reqProps.tags[0]), { pascalCase: true })
+        const className = pascalCase(RemoveSpecialCharacters(reqProps.tags[0]))
         if (className === '') continue
         // 是否存在
         if (!requestClasses[className]) {
@@ -108,12 +107,12 @@ export function requestCodegen(paths: IPaths, isV3: boolean, options: ISwaggerOp
         parsedParameters.imports = imports
 
         // TODO 待优化，目前简单处理同名方法
-        let uniqueMethodName = camelcase(methodName)
+        let uniqueMethodName = camelCase(methodName)
 
         var uniqueMethodNameReg = new RegExp(`^${uniqueMethodName}[0-9]*$`)
 
         const methodCount = requestClasses[className].filter(
-          item => uniqueMethodName === item.name || uniqueMethodNameReg.test(item.name)
+          (item) => uniqueMethodName === item.name || uniqueMethodNameReg.test(item.name)
         ).length
 
         // console.log(uniqueMethodName, methodCount)

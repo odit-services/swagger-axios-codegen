@@ -1,6 +1,6 @@
-import { IRequestBody } from "../swaggerInterfaces";
-import { isNullOrUndefined } from "util";
-import { refClassName } from "../utils";
+import { IRequestBody } from '../swaggerInterfaces'
+import { isNullOrUndefined } from 'util'
+import { refClassName } from '../utils'
 
 export function getRequestBody(requestBody: IRequestBody) {
   // 如果是空则直接反回
@@ -11,7 +11,7 @@ export function getRequestBody(requestBody: IRequestBody) {
 
   const allContent = Object.keys(requestBody.content)
   // 默认去application/json的定义，如果取不到则直接取第一个
-  let reqBody = requestBody.content["application/json"]
+  let reqBody = requestBody.content['application/json']
   // console.log("reqBody 1:", !reqBody);
   if (!reqBody) {
     reqBody = requestBody.content[allContent[0]]
@@ -34,10 +34,9 @@ export function getRequestBody(requestBody: IRequestBody) {
     }
     //TODO: Only temp fix (needs recursion to be perfect)
     else if (reqBody.schema.oneOf) {
-      bodyType = reqBody.schema.oneOf.reduce((p, c) => `${p} | ${refClassName(c.$ref)}`, "").substring(3);
-    }
-    else if (reqBody.schema.anyOf) {
-      bodyType = reqBody.schema.anyOf.reduce((p, c) => `${p} | ${refClassName(c.$ref)}`, "").substring(3);
+      bodyType = reqBody.schema.oneOf.reduce((p, c) => `${p} | ${refClassName(c.$ref)}`, '').substring(3)
+    } else if (reqBody.schema.anyOf) {
+      bodyType = reqBody.schema.anyOf.reduce((p, c) => `${p} | ${refClassName(c.$ref)}`, '').substring(3)
     }
     if (bodyType) {
       imports.push(bodyType)
@@ -45,7 +44,6 @@ export function getRequestBody(requestBody: IRequestBody) {
       /** requestBody */
       body?:${bodyType},`
     }
-
   }
   // console.log("reqbody imports", imports);
 

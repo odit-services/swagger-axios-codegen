@@ -4,12 +4,12 @@ import { refClassName, toBaseType } from '../utils'
 /**
  * 获取请求的返回类型
  */
-export function getResponseType(reqProps: IRequestMethod, isV3: boolean): { responseType: string, isRef: boolean } {
+export function getResponseType(reqProps: IRequestMethod, isV3: boolean): { responseType: string; isRef: boolean } {
   // It does not allow the schema defined directly, but only the primitive type is allowed.
   let result: string = 'any'
   let isRef = false
   // 提取Schema
-  const successStatusCode = Object.keys(reqProps.responses).find(statusCode => statusCode.match(/20[0-4]$/))
+  const successStatusCode = Object.keys(reqProps.responses).find((statusCode) => statusCode.match(/20[0-4]$/))
   if (!successStatusCode) {
     return { responseType: result, isRef }
   }
@@ -40,10 +40,9 @@ export function getResponseType(reqProps: IRequestMethod, isV3: boolean): { resp
       isRef = true
       result = refType + '[]'
     } else if (resSchema.items.oneOf) {
-      result = resSchema.items.oneOf.reduce((p, c) => `${p} | ${refClassName(c.$ref)} []`, "").substring(3);
-    }
-    else if (resSchema.items.anyOf) {
-      result = resSchema.items.anyOf.reduce((p, c) => `${p} | ${refClassName(c.$ref)} []`, "").substring(3);
+      result = resSchema.items.oneOf.reduce((p, c) => `${p} | ${refClassName(c.$ref)} []`, '').substring(3)
+    } else if (resSchema.items.anyOf) {
+      result = resSchema.items.anyOf.reduce((p, c) => `${p} | ${refClassName(c.$ref)} []`, '').substring(3)
     } else {
       const refType = toBaseType(resSchema.items.type, resSchema.items.format)
       result = refType + '[]'
@@ -52,12 +51,10 @@ export function getResponseType(reqProps: IRequestMethod, isV3: boolean): { resp
     // 如果是引用对象
     result = refClassName(resSchema.$ref) || 'any'
     isRef = true
-  }
-  else if (resSchema.oneOf) {
-    result = resSchema.oneOf.reduce((p, c) => `${p} | ${refClassName(c.$ref)}`, "").substring(3);
-  }
-  else if (resSchema.anyOf) {
-    result = resSchema.anyOf.reduce((p, c) => `${p} | ${refClassName(c.$ref)}`, "").substring(3);
+  } else if (resSchema.oneOf) {
+    result = resSchema.oneOf.reduce((p, c) => `${p} | ${refClassName(c.$ref)}`, '').substring(3)
+  } else if (resSchema.anyOf) {
+    result = resSchema.anyOf.reduce((p, c) => `${p} | ${refClassName(c.$ref)}`, '').substring(3)
   } else {
     result = checkType
     result = toBaseType(result, format)
