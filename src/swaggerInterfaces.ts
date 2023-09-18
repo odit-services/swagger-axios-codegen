@@ -1,6 +1,6 @@
 export interface ISwaggerSource {
-  swagger?: string | undefined,
-  openapi?: string | undefined,
+  swagger?: string | undefined
+  openapi?: string | undefined
   info: string
   paths: IPaths
   securityDefinitions: string
@@ -26,12 +26,12 @@ export interface IRequestMethod {
   consumes: string[]
   produces: string[]
   parameters: IParameter[]
-  requestBody: IRequestBody,
+  requestBody: IRequestBody
   responses: {
     [key: string]: {
       description: string
       // v2
-      schema: IResponseSchema,
+      schema: IResponseSchema
       // v3
       content: {
         [key: string]: {
@@ -43,12 +43,12 @@ export interface IRequestMethod {
 }
 
 export interface IResponseSchema {
-  '$ref': string
-  'oneOf': IResponseSchema[]
-  'anyOf': IResponseSchema[]
-  'type'?: string
-  'items'?: IParameterItems
-  'format'?: string
+  $ref: string
+  oneOf: IResponseSchema[]
+  anyOf: IResponseSchema[]
+  type?: string
+  items?: IParameterItems
+  format?: string
 }
 
 export interface IRequestBody {
@@ -79,7 +79,6 @@ export interface IParameterSchema {
   type: string
 }
 
-
 export interface IParameterItems {
   type?: string
   format?: string
@@ -98,7 +97,7 @@ export interface IDefinition {
   type: 'object' | 'array'
   properties: IDefinitionProperties
   additionalProperties: IDefinitionProperty | boolean | undefined
-  enum: any[],
+  enum: any[]
   items: IDefinitionProperty
 }
 
@@ -125,29 +124,29 @@ export interface IComponents {
 }
 
 export interface ISchema {
-  '$ref': string
-  'oneOf': ISchema[]
-  'anyOf': ISchema[]
-  'type'?: string
-  'items'?: IParameterItems
-  'format'?: string,
-  'properties'?: { [key: string]: IParameterItems }
+  $ref: string
+  oneOf: ISchema[]
+  anyOf: ISchema[]
+  type?: string
+  items?: IParameterItems
+  format?: string
+  properties?: { [key: string]: IParameterItems }
 }
 
 // 字典类型，对应java map或者.NET Dictionary
 
 export interface IDictionary<TKey, TValue = any> {
-  [key: string]: TValue;
+  [key: string]: TValue
 }
 
 export interface IDictionary<TKey, TValue = any> {
-  [key: number]: TValue;
+  [key: number]: TValue
 }
 
 export class Dictionary<TKey, TValue> implements IDictionary<TKey, TValue> {
-  [key: string]: TValue;
+  [key: string]: TValue
 }
 
 export class Map<TKey, TValue> implements IDictionary<TKey, TValue> {
-  [key: string]: TValue;
+  [key: string]: TValue
 }

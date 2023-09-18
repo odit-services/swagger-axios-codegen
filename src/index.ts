@@ -1,9 +1,9 @@
 import * as fs from 'fs'
 import * as path from 'path'
-import prettier from 'prettier'
+import * as prettier from 'prettier'
 import axios from 'axios'
 import pascalcase from 'pascalcase'
-import multimatch from 'multimatch';
+import multimatch from 'multimatch'
 import { ISwaggerOptions, IInclude, IDefinitionClasses, IDefinitionEnums } from './baseInterfaces'
 import { ISwaggerSource } from './swaggerInterfaces'
 import {
@@ -70,12 +70,11 @@ export async function codegen(params: ISwaggerOptions) {
   if (options.sharedServiceOptions) {
     writeFile(options.outputDir || '', 'serviceOptions.ts' || '', format(serviceHeaderSource, options))
     apiSource += `import { IRequestOptions, IRequestConfig, getConfigs, axios } from "./serviceOptions";`
-  }
-  else {
+  } else {
     apiSource += serviceHeaderSource
   }
   // 改为到处basePath 可以让 多文件模式使用
-  apiSource += `export const basePath = '${trimString(swaggerSource.basePath, '/', 'right')}'`;
+  apiSource += `export const basePath = '${trimString(swaggerSource.basePath, '/', 'right')}'`
   apiSource += definitionHeader(options.extendDefinitionFile)
 
   // 判断是否是openApi3.0或者swagger3.0
@@ -86,8 +85,8 @@ export async function codegen(params: ISwaggerOptions) {
   let paths = swaggerSource.paths
   if (options.urlFilters?.length > 0) {
     paths = {}
-    Object.keys(swaggerSource.paths).forEach(path => {
-      if (options.urlFilters.some(urlFilter => urlFilter.indexOf(path) > -1)) {
+    Object.keys(swaggerSource.paths).forEach((path) => {
+      if (options.urlFilters.some((urlFilter) => urlFilter.indexOf(path) > -1)) {
         paths[path] = swaggerSource.paths[path]
       }
     })
@@ -108,11 +107,13 @@ export async function codegen(params: ISwaggerOptions) {
     Object.entries(requestCodegen(swaggerSource.paths, isV3, options)).forEach(([className, requests]) => {
       let text = ''
       let allImport: string[] = []
-      requests.forEach(req => {
+      requests.forEach((req) => {
         const reqName = options.methodNameMode == 'operationId' ? req.operationId : req.name
         if ('register' === reqName) {
-          console.log('req.requestSchema.parsedParameters.imports', JSON.stringify(req.requestSchema.parsedParameters.imports));
-
+          console.log(
+            'req.requestSchema.parsedParameters.imports',
+            JSON.stringify(req.requestSchema.parsedParameters.imports)
+          )
         }
         text += requestTemplate(reqName, req.requestSchema, options)
         let imports = findDeepRefs(req.requestSchema.parsedParameters.imports, _allModel, _allEnum)
@@ -121,11 +122,18 @@ export async function codegen(params: ISwaggerOptions) {
 
       // unique import
       const uniqueImports: string[] = []
-      allImport.push(...getDefinedGenericTypes(), 'IRequestOptions', 'IRequestConfig', 'getConfigs', 'axios', 'basePath')
+      allImport.push(
+        ...getDefinedGenericTypes(),
+        'IRequestOptions',
+        'IRequestConfig',
+        'getConfigs',
+        'axios',
+        'basePath'
+      )
       for (const item of allImport) {
         if (!uniqueImports.includes(item)) uniqueImports.push(item)
       }
-      console.log(disableLint());
+      console.log(disableLint())
 
       text = disableLint() + text
       text = serviceTemplate(className + options.serviceNameSuffix, text, uniqueImports)
@@ -134,26 +142,24 @@ export async function codegen(params: ISwaggerOptions) {
 
     let defsString = ''
 
-
-
-    Object.values(models).forEach(item => {
+    Object.values(models).forEach((item) => {
       const text =
         params.modelMode === 'interface'
           ? interfaceTemplate(item.value.name, item.value.props, [], params.strictNullChecks)
           : classTemplate(
-            item.value.name,
-            item.value.props,
-            [],
-            params.strictNullChecks,
-            options.useClassTransformer,
-            options.generateValidationModel
-          )
+              item.value.name,
+              item.value.props,
+              [],
+              params.strictNullChecks,
+              options.useClassTransformer,
+              options.generateValidationModel
+            )
       // const fileDir = path.join(options.outputDir || '', 'definitions')
       // writeFile(fileDir, item.name + '.ts', format(text, options))
       defsString += text
     })
 
-    Object.values(enums).forEach(item => {
+    Object.values(enums).forEach((item) => {
       // const text = item.value ? enumTemplate(item.value.name, item.value.enumProps, 'Enum') : item.content || ''
 
       let text = ''
@@ -167,19 +173,15 @@ export async function codegen(params: ISwaggerOptions) {
         text = item.content || ''
       }
       defsString += text
-
     })
-
 
     defsString = apiSource + defsString
     writeFile(options.outputDir || '', 'index.defs.ts', format(defsString, options))
-
   } else if (options.include && options.include.length > 0) {
     // TODO: use filter plugin
     // codegenInclude(apiSource, options, requestClass, models, enums)
     codegenMultimatchInclude(apiSource, options, requestClass, models, enums)
-  }
-  else {
+  } else {
     codegenAll(apiSource, options, requestClass, models, enums)
   }
   if (fs.existsSync('./cache_swagger.json')) {
@@ -190,7 +192,6 @@ export async function codegen(params: ISwaggerOptions) {
     throw err
   }
 }
-
 
 /** codegenAll */
 function codegenAll(
@@ -206,7 +207,7 @@ function codegenAll(
     // 处理接口
     requestClasses.forEach(([className, requests]) => {
       let text = ''
-      requests.forEach(req => {
+      requests.forEach((req) => {
         const reqName = options.methodNameMode == 'operationId' ? req.operationId : req.name
         text += requestTemplate(reqName, req.requestSchema, options)
       })
@@ -216,22 +217,22 @@ function codegenAll(
 
     // 处理类和枚举
 
-    Object.values(models).forEach(item => {
+    Object.values(models).forEach((item) => {
       const text =
         options.modelMode === 'interface'
           ? interfaceTemplate(item.value.name, item.value.props, [], options.strictNullChecks)
           : classTemplate(
-            item.value.name,
-            item.value.props,
-            [],
-            options.strictNullChecks,
-            options.useClassTransformer,
-            options.generateValidationModel
-          )
+              item.value.name,
+              item.value.props,
+              [],
+              options.strictNullChecks,
+              options.useClassTransformer,
+              options.generateValidationModel
+            )
       apiSource += text
     })
 
-    Object.values(enums).forEach(item => {
+    Object.values(enums).forEach((item) => {
       let text = ''
       if (item.value) {
         if (item.value.type == 'string') {
@@ -260,8 +261,8 @@ function codegenInclude(
   options: ISwaggerOptions,
   requestClass: IRequestClass,
   models: IDefinitionClasses,
-  enums: IDefinitionEnums) {
-
+  enums: IDefinitionEnums
+) {
   let requestClasses = Object.entries(requestClass)
   // 接口过滤入口
   let reqSource = ''
@@ -273,7 +274,7 @@ function codegenInclude(
   let allImport: string[] = []
 
   // 处理接口
-  options.include.forEach(item => {
+  options.include.forEach((item) => {
     let includeClassName = ''
     let includeRequests: string[] = null
     if (Object.prototype.toString.call(item) === '[object String]') {
@@ -309,24 +310,24 @@ function codegenInclude(
   })
 
   // 处理类和枚举
-  allModel.forEach(item => {
+  allModel.forEach((item) => {
     if (allImport.includes(item.name) || options.includeTypes.includes(item.name)) {
       const text =
         options.modelMode === 'interface'
           ? interfaceTemplate(item.value.name, item.value.props, [], options.strictNullChecks)
           : classTemplate(
-            item.value.name,
-            item.value.props,
-            [],
-            options.strictNullChecks,
-            options.useClassTransformer,
-            options.generateValidationModel
-          )
+              item.value.name,
+              item.value.props,
+              [],
+              options.strictNullChecks,
+              options.useClassTransformer,
+              options.generateValidationModel
+            )
       defSource += text
     }
   })
 
-  allEnum.forEach(item => {
+  allEnum.forEach((item) => {
     if (allImport.includes(item.name) || options.includeTypes.includes(item.name)) {
       let text = ''
       if (item.value) {
@@ -354,7 +355,6 @@ function codegenMultimatchInclude(
   models: IDefinitionClasses,
   enums: IDefinitionEnums
 ) {
-
   let requestClasses = Object.entries(requestClass)
   // 接口过滤入口
   let reqSource = ''
@@ -366,14 +366,14 @@ function codegenMultimatchInclude(
   let allImport: string[] = []
 
   // #region 处理匹配集合
-  const sourceClassNames = requestClasses.map(v => {
+  const sourceClassNames = requestClasses.map((v) => {
     const className = v[0]
     return className
   })
 
   const includeRules: Record<string, Set<string>> = {}
-  options.include.forEach(classNameFilter => {
-    // *,?,**,{},!, 
+  options.include.forEach((classNameFilter) => {
+    // *,?,**,{},!,
     // NOTICE: 目前要求 className 严格按照pascalcase书写
     if (typeof classNameFilter === 'string') {
       if (includeRules[classNameFilter] === undefined) {
@@ -381,13 +381,11 @@ function codegenMultimatchInclude(
       }
       includeRules[classNameFilter].add('*')
     } else {
-      Object.keys(classNameFilter).forEach(key => {
+      Object.keys(classNameFilter).forEach((key) => {
         if (includeRules[key] === undefined) {
           includeRules[key] = new Set()
         }
-        classNameFilter[key].forEach(requestFilter =>
-          includeRules[key].add(requestFilter)
-        )
+        classNameFilter[key].forEach((requestFilter) => includeRules[key].add(requestFilter))
       })
     }
   })
@@ -398,16 +396,14 @@ function codegenMultimatchInclude(
 
   // {tagNames:[...requestFilters]}
   const requiredClassNameMap: Record<string, Set<string>> = {}
-  Object.keys(includeRules).forEach(classNameFilter => {
+  Object.keys(includeRules).forEach((classNameFilter) => {
     // matched tagnames
     const requiredClassNames = multimatch(matchedClassNames, classNameFilter)
-    requiredClassNames.forEach(className => {
+    requiredClassNames.forEach((className) => {
       if (requiredClassNameMap[className] === undefined) {
         requiredClassNameMap[className] = new Set()
       }
-      includeRules[classNameFilter].forEach(requestFilter =>
-        requiredClassNameMap[className].add(requestFilter)
-      )
+      includeRules[classNameFilter].forEach((requestFilter) => requiredClassNameMap[className].add(requestFilter))
     })
   })
   // console.log('className->requestRules', requiredClassNameMap)
@@ -421,7 +417,7 @@ function codegenMultimatchInclude(
     if (includeRequestsFilters) {
       let text = ''
       const requestKeyMap: Record<string, IRequestMethods> = {}
-      const requestKeys = requests.map(v => {
+      const requestKeys = requests.map((v) => {
         const reqName = options.methodNameMode == 'operationId' ? v.operationId : v.name
         requestKeyMap[reqName] = v
         return reqName
@@ -434,7 +430,7 @@ function codegenMultimatchInclude(
       // console.log(`${className}-methods-all`, requestKeys)
       // console.log(`${className}-methods-matched`, requiredRequestKeys)
 
-      requiredRequestKeys.forEach(reqName => {
+      requiredRequestKeys.forEach((reqName) => {
         const req = requestKeyMap[reqName]
         text += requestTemplate(reqName, req.requestSchema, options)
         // generate ref definition model
@@ -445,7 +441,6 @@ function codegenMultimatchInclude(
 
       text = serviceTemplate(className + options.serviceNameSuffix, text)
       apiSource += text
-
     }
   })
 
@@ -455,24 +450,24 @@ function codegenMultimatchInclude(
 
   // 处理类和枚举
 
-  allModel.forEach(item => {
+  allModel.forEach((item) => {
     if (allImport.includes(item.name) || options.includeTypes.includes(item.name)) {
       const text =
         options.modelMode === 'interface'
           ? interfaceTemplate(item.value.name, item.value.props, [], options.strictNullChecks)
           : classTemplate(
-            item.value.name,
-            item.value.props,
-            [],
-            options.strictNullChecks,
-            options.useClassTransformer,
-            options.generateValidationModel
-          )
+              item.value.name,
+              item.value.props,
+              [],
+              options.strictNullChecks,
+              options.useClassTransformer,
+              options.generateValidationModel
+            )
       defSource += text
     }
   })
 
-  allEnum.forEach(item => {
+  allEnum.forEach((item) => {
     if (allImport.includes(item.name) || options.includeTypes.includes(item.name)) {
       let text = ''
       if (item.value) {
@@ -493,7 +488,6 @@ function codegenMultimatchInclude(
   apiSource += reqSource + defSource
   writeFile(options.outputDir || '', options.fileName || '', format(apiSource, options))
 }
-
 
 function writeFile(fileDir: string, name: string, data: any) {
   if (!fs.existsSync(fileDir)) {
