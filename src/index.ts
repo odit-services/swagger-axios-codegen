@@ -146,13 +146,13 @@ export async function codegen(params: ISwaggerOptions) {
         params.modelMode === 'interface'
           ? interfaceTemplate(item.value.name, item.value.props, [], params.strictNullChecks)
           : classTemplate(
-              item.value.name,
-              item.value.props,
-              [],
-              params.strictNullChecks,
-              options.useClassTransformer,
-              options.generateValidationModel
-            )
+            item.value.name,
+            item.value.props,
+            [],
+            params.strictNullChecks,
+            options.useClassTransformer,
+            options.generateValidationModel
+          )
       // const fileDir = path.join(options.outputDir || '', 'definitions')
       // writeFile(fileDir, item.name + '.ts', format(text, options))
       defsString += text
@@ -217,13 +217,13 @@ async function codegenAll(
         options.modelMode === 'interface'
           ? interfaceTemplate(item.value.name, item.value.props, [], options.strictNullChecks)
           : classTemplate(
-              item.value.name,
-              item.value.props,
-              [],
-              options.strictNullChecks,
-              options.useClassTransformer,
-              options.generateValidationModel
-            )
+            item.value.name,
+            item.value.props,
+            [],
+            options.strictNullChecks,
+            options.useClassTransformer,
+            options.generateValidationModel
+          )
       apiSource += text
     })
 
@@ -260,19 +260,19 @@ function writeFile(fileDir: string, name: string, data: any) {
 }
 
 async function format(text: string, options: ISwaggerOptions) {
-  if (options.format) {
-    // console.log('use custom formatter')
-    return options.format(text)
-  }
+  // if (options.format) {
+  // console.log('use custom formatter')
+  //   return options.format(text)
+  // }
   // console.log('use default formatter')
-  return await prettier.format(text, {
-    printWidth: 120,
-    tabWidth: 2,
-    parser: 'typescript',
-    trailingComma: 'none',
-    jsxBracketSameLine: false,
-    semi: true,
-    singleQuote: true
-  })
-  // return text
+  // return await prettier.format(text, {
+  //   printWidth: 120,
+  //   tabWidth: 2,
+  //   parser: 'typescript',
+  //   trailingComma: 'none',
+  //   jsxBracketSameLine: false,
+  //   semi: true,
+  //   singleQuote: true
+  // })
+  return text
 }
